@@ -1,63 +1,184 @@
-// Visualização da Imagem
-document.getElementById('imageInput').addEventListener('change', function(event) {
-  const file = event.target.files[0];
-  const preview = document.getElementById('imagePreview');
-  
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  } else {
-    preview.src = '';
-    preview.style.display = 'none';
-  }
-});
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
 
-// Função para calcular a pontuação individual por matéria
-function calcularResultado() {
-  const totalMaterias = 5;
-  let relatorioHtml = '';
-  let pontuacaoTotalGeral = 0;
+body {
+  background-color: #eef2f5;
+  color: #2c3e50;
+  padding: 20px;
+}
 
-  for (let i = 1; i <= totalMaterias; i++) {
-    const gabaritoRaw = document.getElementById(`gabarito_m${i}`).value;
-    const alunoRaw = document.getElementById(`aluno_m${i}`).value;
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+}
 
-    // Converte a string separada por vírgula em array e remove espaços
-    const gabarito = gabaritoRaw.split(',').map(item => item.trim().toUpperCase());
-    const aluno = alunoRaw.split(',').map(item => item.trim().toUpperCase());
+.header {
+  text-align: center;
+  margin-bottom: 25px;
+}
 
-    let pontosMateria = 0;
-    const totalQuestoes = gabarito.length;
+.header h1 {
+  font-size: 1.8rem;
+  color: #1a365d;
+}
 
-    // Compara resposta por resposta (1 ponto por questão)
-    for (let j = 0; j < totalQuestoes; j++) {
-      if (aluno[j] && aluno[j] === gabarito[j]) {
-        pontosMateria += 1;
-      }
-    }
+.header p {
+  color: #4a5568;
+  font-size: 0.95rem;
+  margin-top: 5px;
+}
 
-    pontuacaoTotalGeral += pontosMateria;
+.card {
+  background: #ffffff;
+  padding: 24px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
 
-    relatorioHtml += `
-      <div class="resultado-item">
-        <span><strong>Matéria ${i}:</strong> ${pontosMateria} / ${totalQuestoes} pontos</span>
-      </div>
-    `;
-  }
+h2 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+  color: #2b6cb0;
+  border-bottom: 2px solid #ebf8ff;
+  padding-bottom: 8px;
+}
 
-  relatorioHtml += `
-    <div class="resultado-total">
-      Pontuação Total Geral: ${pontuacaoTotalGeral} pontos
-    </div>
-  `;
+.subtitle {
+  font-size: 0.85rem;
+  color: #718096;
+  margin-bottom: 18px;
+}
 
-  const resultadoCard = document.getElementById('resultadoCard');
-  const resultadoConteudo = document.getElementById('resultadoConteudo');
-  
-  resultadoConteudo.innerHTML = relatorioHtml;
-  resultadoCard.style.display = 'block';
+.input-group label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+input[type="file"] {
+  width: 100%;
+  padding: 10px;
+  background: #f7fafc;
+  border: 1px dashed #cbd5e0;
+  border-radius: 6px;
+}
+
+#imagePreview {
+  max-width: 100%;
+  max-height: 350px;
+  margin-top: 15px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e0;
+}
+
+.disciplinas-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.disciplina-box {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  padding: 14px;
+  border-radius: 6px;
+}
+
+.disciplina-box h3 {
+  font-size: 0.95rem;
+  margin-bottom: 10px;
+  color: #2d3748;
+  background: #edf2f7;
+  padding: 6px 10px;
+  border-radius: 4px;
+}
+
+.q-group {
+  margin-bottom: 8px;
+}
+
+.q-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #4a5568;
+}
+
+input[type="text"] {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #cbd5e0;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+input[type="text"]:focus {
+  border-color: #3182ce;
+  outline: none;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background-color: #2b6cb0;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background-color: #2c5282;
+}
+
+/* Tabela de Resultados */
+.resumo-geral {
+  background: #ebf8ff;
+  border: 1px solid #bee3f8;
+  padding: 15px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  text-align: center;
+  font-size: 1.1rem;
+  color: #2b6cb0;
+}
+
+.tabela-resultados {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.tabela-resultados th, 
+.tabela-resultados td {
+  border: 1px solid #e2e8f0;
+  padding: 10px;
+  text-align: left;
+  font-size: 0.9rem;
+}
+
+.tabela-resultados th {
+  background-color: #f7fafc;
+  color: #4a5568;
+}
+
+.status-acerto {
+  color: #38a169;
+  font-weight: bold;
+}
+
+.status-erro {
+  color: #e53e3e;
+  font-weight: bold;
 }
