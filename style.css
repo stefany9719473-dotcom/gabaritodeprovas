@@ -67,21 +67,31 @@ input[type="file"] {
   background: #f7fafc;
   border: 1px dashed #cbd5e0;
   border-radius: 6px;
+  margin-bottom: 12px;
 }
 
 #imagePreview {
   max-width: 100%;
   max-height: 350px;
-  margin-top: 15px;
+  margin-bottom: 15px;
   border-radius: 6px;
   border: 1px solid #cbd5e0;
+}
+
+.status-loading {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #feebc8;
+  color: #c05621;
+  border-radius: 6px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .disciplinas-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 16px;
-  margin-bottom: 20px;
 }
 
 .disciplina-box {
@@ -119,11 +129,6 @@ input[type="text"] {
   text-transform: uppercase;
 }
 
-input[type="text"]:focus {
-  border-color: #3182ce;
-  outline: none;
-}
-
 .btn-primary {
   width: 100%;
   padding: 14px;
@@ -141,7 +146,6 @@ input[type="text"]:focus {
   background-color: #2c5282;
 }
 
-/* Tabela de Resultados */
 .resumo-geral {
   background: #ebf8ff;
   border: 1px solid #bee3f8;
