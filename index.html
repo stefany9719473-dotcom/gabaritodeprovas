@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Corretor de Gabarito</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Sistema de Correção de Gabarito</h1>
+
+    <!-- Seção de Entrada/Upload -->
+    <section class="card">
+      <h2>1. Imagem do Gabarito</h2>
+      <div class="input-group">
+        <label for="imageInput">Upload da imagem ou Captura pela Câmera:</label>
+        <input type="file" id="imageInput" accept="image/*" capture="environment">
+      </div>
+      <div id="previewContainer">
+        <img id="imagePreview" src="" alt="Pré-visualização da Imagem" style="display: none;">
+      </div>
+    </section>
+
+    <!-- Seção de Configuração das Respostas -->
+    <section class="card">
+      <h2>2. Preenchimento de Respostas (1 a 5)</h2>
+      <p class="subtitle">Cada questão vale 1 ponto.</p>
+
+      <form id="gabaritoForm">
+        <div class="disciplinas-grid">
+          
+          <!-- Matéria 1 -->
+          <div class="disciplina-box">
+            <h3>Matéria 1</h3>
+            <div class="q-group">
+              <label>Gabarito Oficial:</label>
+              <input type="text" id="gabarito_m1" placeholder="Ex: A,B,C,D,A" value="A,B,C,D,E">
+            </div>
+            <div class="q-group">
+              <label>Resposta do Aluno:</label>
+              <input type="text" id="aluno_m1" placeholder="Ex: A,B,C,D,A">
+            </div>
+          </div>
+
+          <!-- Matéria 2 -->
+          <div class="disciplina-box">
+            <h3>Matéria 2</h3>
+            <div class="q-group">
+              <label>Gabarito Oficial:</label>
+              <input type="text" id="gabarito_m2" placeholder="Ex: A,B,C,D,A" value="B,C,D,E,A">
+            </div>
+            <div class="q-group">
+              <label>Resposta do Aluno:</label>
+              <input type="text" id="aluno_m2" placeholder="Ex: A,B,C,D,A">
+            </div>
+          </div>
+
+          <!-- Matéria 3 -->
+          <div class="disciplina-box">
+            <h3>Matéria 3</h3>
+            <div class="q-group">
+              <label>Gabarito Oficial:</label>
+              <input type="text" id="gabarito_m3" placeholder="Ex: A,B,C,D,A" value="C,D,E,A,B">
+            </div>
+            <div class="q-group">
+              <label>Resposta do Aluno:</label>
+              <input type="text" id="aluno_m3" placeholder="Ex: A,B,C,D,A">
+            </div>
+          </div>
+
+          <!-- Matéria 4 -->
+          <div class="disciplina-box">
+            <h3>Matéria 4</h3>
+            <div class="q-group">
+              <label>Gabarito Oficial:</label>
+              <input type="text" id="gabarito_m4" placeholder="Ex: A,B,C,D,A" value="D,E,A,B,C">
+            </div>
+            <div class="q-group">
+              <label>Resposta do Aluno:</label>
+              <input type="text" id="aluno_m4" placeholder="Ex: A,B,C,D,A">
+            </div>
+          </div>
+
+          <!-- Matéria 5 -->
+          <div class="disciplina-box">
+            <h3>Matéria 5</h3>
+            <div class="q-group">
+              <label>Gabarito Oficial:</label>
+              <input type="text" id="gabarito_m5" placeholder="Ex: A,B,C,D,A" value="E,A,B,C,D">
+            </div>
+            <div class="q-group">
+              <label>Resposta do Aluno:</label>
+              <input type="text" id="aluno_m5" placeholder="Ex: A,B,C,D,A">
+            </div>
+          </div>
+
+        </div>
+
+        <button type="button" id="btnCalcular" onclick="calcularResultado()">Corrigir Gabarito</button>
+      </form>
+    </section>
+
+    <!-- Resultados -->
+    <section class="card" id="resultadoCard" style="display: none;">
+      <h2>Resultado da Correção</h2>
+      <div id="resultadoConteudo"></div>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
