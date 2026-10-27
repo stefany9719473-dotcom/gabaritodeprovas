@@ -1,11 +1,10 @@
-// Nomes padrão para as 12 disciplinas
 const nomesDisciplinas = [
   "Língua Portuguesa", "Matemática", "Raciocínio Lógico", "Informática",
   "Direito Constitucional", "Direito Administrativo", "Conhecimentos Gerais",
   "Atualidades", "Legislação Específica", "Física", "Química", "Biologia"
 ];
 
-// Monta a interface das 12 matérias ao carregar a página
+// Monta a interface das 12 matérias
 document.addEventListener("DOMContentLoaded", function() {
   const grid = document.getElementById("disciplinasGrid");
   let htmlContent = "";
@@ -13,18 +12,17 @@ document.addEventListener("DOMContentLoaded", function() {
   for (let i = 1; i <= 12; i++) {
     const qInicio = (i - 1) * 5 + 1;
     const qFim = i * 5;
-    const nomeMateria = nomesDisciplinas[i - 1];
 
     htmlContent += `
       <div class="disciplina-box">
-        <h3>Matéria ${i}: ${nomeMateria} (Q${qInicio} a Q${qFim})</h3>
+        <h3>Matéria ${i}: ${nomesDisciplinas[i - 1]} (Q${qInicio}-Q${qFim})</h3>
         <div class="q-group">
-          <label for="gabarito_m${i}">Gabarito Oficial (5 respostas):</label>
-          <input type="text" id="gabarito_m${i}" placeholder="Ex: A,B,C,D,E" value="A,B,C,D,E">
+          <label>Gabarito Oficial:</label>
+          <input type="text" id="gabarito_m${i}" value="A,B,C,D,E">
         </div>
         <div class="q-group">
-          <label for="aluno_m${i}">Respostas do Candidato:</label>
-          <input type="text" id="aluno_m${i}" placeholder="Ex: A,B,C,D,E">
+          <label>Extraído do Cartão (Aluno):</label>
+          <input type="text" id="aluno_m${i}" placeholder="Aguardando leitura...">
         </div>
       </div>
     `;
@@ -33,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
   grid.innerHTML = htmlContent;
 });
 
-// Pré-visualização da Imagem do Cartão Resposta
+// Exibe a imagem selecionada
 document.getElementById('imageInput').addEventListener('change', function(event) {
   const file = event.target.files[0];
   const preview = document.getElementById('imagePreview');
@@ -45,23 +43,75 @@ document.getElementById('imageInput').addEventListener('change', function(event)
       preview.style.display = 'block';
     };
     reader.readAsDataURL(file);
-  } else {
-    preview.src = '';
-    preview.style.display = 'none';
   }
 });
 
-// Processamento de Correção Rigoroso
-function corrigirProva() {
-  const totalDisciplinas = 12;
+// Processamento por OCR (Tesseract.js)
+async function processarFotoECorrigir() {
+  const imageInput = document.getElementById('imageInput');
+  const statusOCR = document.getElementById('statusOCR');
+
+  if (!imageInput.files[0]) {
+    alert("Por favor, selecione ou tire uma foto do cartão-resposta primeiro.");
+    return;
+  }
+
+  statusOCR.style.display = 'block';
+  statusOCR.innerText = "Lendo imagem e identificando letras (A, B, C, D, E)...";
+
+  try {
+    // Executa a leitura OCR da imagem
+    const result = await Tesseract.recognize(
+      imageInput.files[0],
+      'por',
+      {
+        logger: m => {
+          if (m.status === 'recognizing text') {
+            statusOCR.innerText = `Processando imagem: ${Math.round(m.progress * 100)}%`;
+          }
+        }
+      }
+    );
+
+    const textoExtraido = result.data.text;
+    
+    // Filtra apenas as letras das alternativas (A, B, C, D, E)
+    const respostasEncontradas = textoExtraido
+      .toUpperCase()
+      .replace(/[^ABCDE]/g, '')
+      .split('');
+
+    statusOCR.innerText = `Leitura concluída! ${respostasEncontradas.length} respostas identificadas.`;
+
+    // Preenche os campos das 12 disciplinas com as respostas extraídas (5 por matéria)
+    for (let i = 1; i <= 12; i++) {
+      const inicio = (i - 1) * 5;
+      const blocoMateria = respostasEncontradas.slice(inicio, inicio + 5);
+      
+      const inputAluno = document.getElementById(`aluno_m${i}`);
+      inputAluno.value = blocoMateria.join(', ');
+    }
+
+    // Calcula os pontos automaticamente após preencher
+    calcularResultadoFinal();
+
+  } catch (error) {
+    console.error(error);
+    statusOCR.innerText = "Erro ao processar imagem. Tente uma foto mais nítida.";
+  }
+}
+
+// Somatória das 12 disciplinas
+function calcularResultadoFinal() {
   let pontuacaoTotal = 0;
-  let maxPontosPossiveis = 60;
+  const totalQuestoes = 60;
+  
   let tabelaHtml = `
     <table class="tabela-resultados">
       <thead>
         <tr>
           <th>Disciplina</th>
-          <th>Faixa de Questões</th>
+          <th>Faixa</th>
           <th>Acertos / Total</th>
           <th>Aproveitamento</th>
         </tr>
@@ -69,18 +119,17 @@ function corrigirProva() {
       <tbody>
   `;
 
-  for (let i = 1; i <= totalDisciplinas; i++) {
+  for (let i = 1; i <= 12; i++) {
     const gabaritoRaw = document.getElementById(`gabarito_m${i}`).value;
     const alunoRaw = document.getElementById(`aluno_m${i}`).value;
 
-    const gabarito = gabaritoRaw.split(',').map(item => item.trim().toUpperCase());
-    const aluno = alunoRaw.split(',').map(item => item.trim().toUpperCase());
+    const gabarito = gabaritoRaw.split(',').map(x => x.trim().toUpperCase());
+    const aluno = alunoRaw.split(',').map(x => x.trim().toUpperCase());
 
     let acertosMateria = 0;
     const qInicio = (i - 1) * 5 + 1;
     const qFim = i * 5;
 
-    // Comparação de cada uma das 5 questões da disciplina
     for (let j = 0; j < 5; j++) {
       if (aluno[j] && aluno[j] === gabarito[j]) {
         acertosMateria += 1;
@@ -101,11 +150,10 @@ function corrigirProva() {
   }
 
   tabelaHtml += `</tbody></table>`;
-
-  const percentualGeral = ((pontuacaoTotal / maxPontosPossiveis) * 100).toFixed(1);
+  const percentualGeral = ((pontuacaoTotal / totalQuestoes) * 100).toFixed(1);
 
   document.getElementById('resumoGeral').innerHTML = `
-    Pontuação Final: ${pontuacaoTotal} de ${maxPontosPossiveis} pontos (${percentualGeral}% de aproveitamento)
+    Pontuação Final: ${pontuacaoTotal} de ${totalQuestoes} pontos (${percentualGeral}% de aproveitamento)
   `;
   document.getElementById('detalhesDisciplinas').innerHTML = tabelaHtml;
   document.getElementById('resultadoCard').style.display = 'block';
