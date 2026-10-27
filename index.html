@@ -3,43 +3,44 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sistema de Correção de Provas - Gabarito Oficial</title>
+  <title>Correção Automática via Foto - 60 Questões</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Biblioteca Tesseract.js para OCR (Extração de texto de imagem) -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
 </head>
 <body>
   <div class="container">
     <header class="header">
-      <h1>Sistema Oficial de Correção de Gabaritos</h1>
-      <p>Estrutura de Prova: 12 Disciplinas | 60 Questões (5 por matéria) | 1 Ponto por Questão</p>
+      <h1>Sistema de Leitura Automatizada de Gabarito</h1>
+      <p>12 Disciplinas | 60 Questões | Leitura Automática por OCR</p>
     </header>
 
-    <!-- Upload/Captura da Cartão Resposta -->
+    <!-- Upload/Captura da Foto -->
     <section class="card">
-      <h2>1. Captura do Cartão-Resposta</h2>
+      <h2>1. Captura da Imagem do Cartão-Resposta</h2>
       <div class="input-group">
-        <label for="imageInput">Envie a foto ou use a câmera do dispositivo:</label>
+        <label for="imageInput">Tire a foto ou faça upload do cartão preenchido:</label>
         <input type="file" id="imageInput" accept="image/*" capture="environment">
       </div>
       <div id="previewContainer">
         <img id="imagePreview" src="" alt="Pré-visualização do Cartão" style="display: none;">
       </div>
+      <button type="button" class="btn-primary" id="btnProcessar" onclick="processarFotoECorrigir()">
+        Tirar Foto e Extrair Respostas
+      </button>
+      <div id="statusOCR" class="status-loading" style="display: none;"></div>
     </section>
 
-    <!-- Formulário das 12 Disciplinas -->
+    <!-- Gabarito Oficial (Configuração) -->
     <section class="card">
-      <h2>2. Grade de Respostas das Disciplinas (Questões 01 a 60)</h2>
-      <p class="subtitle">Insira as respostas separadas por vírgula (Ex: A, B, C, D, E).</p>
-
-      <form id="gabaritoForm">
-        <div class="disciplinas-grid" id="disciplinasGrid">
-          <!-- As 12 disciplinas serão geradas via Script para manter o código limpo -->
-        </div>
-
-        <button type="button" class="btn-primary" onclick="corrigirProva()">Processar Correção</button>
-      </form>
+      <h2>2. Configuração do Gabarito Oficial</h2>
+      <p class="subtitle">Insira o gabarito correto das 12 disciplinas (5 questões cada):</p>
+      <div class="disciplinas-grid" id="disciplinasGrid">
+        <!-- As 12 disciplinas são geradas dinamicamente -->
+      </div>
     </section>
 
-    <!-- Painel de Relatório Oficial -->
+    <!-- Painel de Relatório Final -->
     <section class="card" id="resultadoCard" style="display: none;">
       <h2>Relatório Final de Desempenho</h2>
       <div class="resumo-geral" id="resumoGeral"></div>
