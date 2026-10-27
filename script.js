@@ -1,184 +1,112 @@
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Segoe UI', Arial, sans-serif;
-}
+// Nomes padrão para as 12 disciplinas
+const nomesDisciplinas = [
+  "Língua Portuguesa", "Matemática", "Raciocínio Lógico", "Informática",
+  "Direito Constitucional", "Direito Administrativo", "Conhecimentos Gerais",
+  "Atualidades", "Legislação Específica", "Física", "Química", "Biologia"
+];
 
-body {
-  background-color: #eef2f5;
-  color: #2c3e50;
-  padding: 20px;
-}
+// Monta a interface das 12 matérias ao carregar a página
+document.addEventListener("DOMContentLoaded", function() {
+  const grid = document.getElementById("disciplinasGrid");
+  let htmlContent = "";
 
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-}
+  for (let i = 1; i <= 12; i++) {
+    const qInicio = (i - 1) * 5 + 1;
+    const qFim = i * 5;
+    const nomeMateria = nomesDisciplinas[i - 1];
 
-.header {
-  text-align: center;
-  margin-bottom: 25px;
-}
+    htmlContent += `
+      <div class="disciplina-box">
+        <h3>Matéria ${i}: ${nomeMateria} (Q${qInicio} a Q${qFim})</h3>
+        <div class="q-group">
+          <label for="gabarito_m${i}">Gabarito Oficial (5 respostas):</label>
+          <input type="text" id="gabarito_m${i}" placeholder="Ex: A,B,C,D,E" value="A,B,C,D,E">
+        </div>
+        <div class="q-group">
+          <label for="aluno_m${i}">Respostas do Candidato:</label>
+          <input type="text" id="aluno_m${i}" placeholder="Ex: A,B,C,D,E">
+        </div>
+      </div>
+    `;
+  }
 
-.header h1 {
-  font-size: 1.8rem;
-  color: #1a365d;
-}
+  grid.innerHTML = htmlContent;
+});
 
-.header p {
-  color: #4a5568;
-  font-size: 0.95rem;
-  margin-top: 5px;
-}
+// Pré-visualização da Imagem do Cartão Resposta
+document.getElementById('imageInput').addEventListener('change', function(event) {
+  const file = event.target.files[0];
+  const preview = document.getElementById('imagePreview');
+  
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  } else {
+    preview.src = '';
+    preview.style.display = 'none';
+  }
+});
 
-.card {
-  background: #ffffff;
-  padding: 24px;
-  margin-bottom: 20px;
-  border-radius: 8px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-}
+// Processamento de Correção Rigoroso
+function corrigirProva() {
+  const totalDisciplinas = 12;
+  let pontuacaoTotal = 0;
+  let maxPontosPossiveis = 60;
+  let tabelaHtml = `
+    <table class="tabela-resultados">
+      <thead>
+        <tr>
+          <th>Disciplina</th>
+          <th>Faixa de Questões</th>
+          <th>Acertos / Total</th>
+          <th>Aproveitamento</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
 
-h2 {
-  font-size: 1.25rem;
-  margin-bottom: 12px;
-  color: #2b6cb0;
-  border-bottom: 2px solid #ebf8ff;
-  padding-bottom: 8px;
-}
+  for (let i = 1; i <= totalDisciplinas; i++) {
+    const gabaritoRaw = document.getElementById(`gabarito_m${i}`).value;
+    const alunoRaw = document.getElementById(`aluno_m${i}`).value;
 
-.subtitle {
-  font-size: 0.85rem;
-  color: #718096;
-  margin-bottom: 18px;
-}
+    const gabarito = gabaritoRaw.split(',').map(item => item.trim().toUpperCase());
+    const aluno = alunoRaw.split(',').map(item => item.trim().toUpperCase());
 
-.input-group label {
-  display: block;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
+    let acertosMateria = 0;
+    const qInicio = (i - 1) * 5 + 1;
+    const qFim = i * 5;
 
-input[type="file"] {
-  width: 100%;
-  padding: 10px;
-  background: #f7fafc;
-  border: 1px dashed #cbd5e0;
-  border-radius: 6px;
-}
+    // Comparação de cada uma das 5 questões da disciplina
+    for (let j = 0; j < 5; j++) {
+      if (aluno[j] && aluno[j] === gabarito[j]) {
+        acertosMateria += 1;
+      }
+    }
 
-#imagePreview {
-  max-width: 100%;
-  max-height: 350px;
-  margin-top: 15px;
-  border-radius: 6px;
-  border: 1px solid #cbd5e0;
-}
+    pontuacaoTotal += acertosMateria;
+    const porcentagem = ((acertosMateria / 5) * 100).toFixed(0);
 
-.disciplinas-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 16px;
-  margin-bottom: 20px;
-}
+    tabelaHtml += `
+      <tr>
+        <td><strong>${nomesDisciplinas[i - 1]}</strong></td>
+        <td>Q${qInicio} a Q${qFim}</td>
+        <td><span class="${acertosMateria >= 3 ? 'status-acerto' : 'status-erro'}">${acertosMateria} / 5</span></td>
+        <td>${porcentagem}%</td>
+      </tr>
+    `;
+  }
 
-.disciplina-box {
-  background-color: #f8fafc;
-  border: 1px solid #e2e8f0;
-  padding: 14px;
-  border-radius: 6px;
-}
+  tabelaHtml += `</tbody></table>`;
 
-.disciplina-box h3 {
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-  color: #2d3748;
-  background: #edf2f7;
-  padding: 6px 10px;
-  border-radius: 4px;
-}
+  const percentualGeral = ((pontuacaoTotal / maxPontosPossiveis) * 100).toFixed(1);
 
-.q-group {
-  margin-bottom: 8px;
-}
-
-.q-group label {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #4a5568;
-}
-
-input[type="text"] {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #cbd5e0;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
-input[type="text"]:focus {
-  border-color: #3182ce;
-  outline: none;
-}
-
-.btn-primary {
-  width: 100%;
-  padding: 14px;
-  background-color: #2b6cb0;
-  color: #ffffff;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: bold;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #2c5282;
-}
-
-/* Tabela de Resultados */
-.resumo-geral {
-  background: #ebf8ff;
-  border: 1px solid #bee3f8;
-  padding: 15px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-  font-weight: bold;
-  text-align: center;
-  font-size: 1.1rem;
-  color: #2b6cb0;
-}
-
-.tabela-resultados {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 10px;
-}
-
-.tabela-resultados th, 
-.tabela-resultados td {
-  border: 1px solid #e2e8f0;
-  padding: 10px;
-  text-align: left;
-  font-size: 0.9rem;
-}
-
-.tabela-resultados th {
-  background-color: #f7fafc;
-  color: #4a5568;
-}
-
-.status-acerto {
-  color: #38a169;
-  font-weight: bold;
-}
-
-.status-erro {
-  color: #e53e3e;
-  font-weight: bold;
+  document.getElementById('resumoGeral').innerHTML = `
+    Pontuação Final: ${pontuacaoTotal} de ${maxPontosPossiveis} pontos (${percentualGeral}% de aproveitamento)
+  `;
+  document.getElementById('detalhesDisciplinas').innerHTML = tabelaHtml;
+  document.getElementById('resultadoCard').style.display = 'block';
 }
